@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Animated Heart Background using Anime.js</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1></h1>
+      <div class="heart"></div>
+    </div>
+    <script src="anime.js"></script>
+    <script>
+      const container = document.querySelector(".container");
+      for (let i = 0; i <= 100; i++) {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        container.appendChild(heart);
+      }
+
+      function animateHearts() {
+        anime({
+          targets: ".heart",
+          translateX: function () {
+            return anime.random(-700, 700);
+          },
+          translateY: function () {
+            return anime.random(-500, 500);
+          },
+          rotate: 45,
+          scale: function () {
+            return anime.random(1, 3);
+          },
+          easing: "easeInOutBack",
+          duration: 3000,
+          delay: anime.stagger(10),
+          complete: animateHearts
+        });
+      }
+
+      animateHearts();
+    </script>
+  </body>
+</html>
