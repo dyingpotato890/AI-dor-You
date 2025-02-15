@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid"; // Generate unique session IDs
+import { v4 as uuidv4 } from "uuid"; // Ensure uuid is installed
 import HeartBackground from "./components/HeartBackground";
 import ChatInput from "./components/ChatInput";
 import ChatDisplay from "./components/ChatDisplay";
@@ -10,7 +10,7 @@ const App = () => {
   const sessionId = useState(uuidv4())[0]; // Persistent session ID
 
   const handleNewMessage = (msg) => {
-    setMessages([...messages, msg]);
+    setMessages((prevMessages) => [...prevMessages, msg]);
   };
 
   return (
