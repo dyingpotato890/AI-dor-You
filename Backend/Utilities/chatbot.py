@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 import os
 from google import genai
+import logging
+
 
 # Load API Key
 load_dotenv()
@@ -14,6 +16,11 @@ user_messages = []
 
 def generateResponse(user_input):
     global conv_history, user_messages
+    
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    
     conv_history.append(f"User: {user_input}")
     user_messages.append(user_input)
 
@@ -35,13 +42,18 @@ def generateResponse(user_input):
             model="gemini-2.0-flash", contents=prompt
         )
 
-        if hasattr(response, "text"):
-            bot_response = response.text.strip()
+        # Validate response
+        if not hasattr(response, "text") or not response.text.strip():
+            logger.warning("Received empty or invalid response from API")
+            bot_response = "Hmm, I'm having trouble thinking of a response. Let's try that again!"
         else:
-            bot_response = "No valid response received. Try again later."
+            bot_response = response.text.strip()
+            logger.info(f"Successfully generated response: {bot_response[:50]}...")
 
     except Exception as e:
-        bot_response = f"An error occurred: {str(e)}"
+        logger.error(f"API Error: {str(e)}")
+        bot_response = "Oops! I'm having some technical difficulties. Let's try that again!"
+
 
     conv_history.append(f"AI: {bot_response}")
     return bot_response
