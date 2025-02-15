@@ -13,11 +13,15 @@ const App = () => {
     setMessages((prevMessages) => [...prevMessages, msg]);
   };
 
+  const handleClearMessages = () => {
+    setMessages([]); // ✅ Clear chat messages when "End" button is clicked
+  };
+
   return (
     <div className="container">
       <HeartBackground />
       <ChatDisplay messages={messages} />
-      <ChatInput onMessageSubmit={handleNewMessage} sessionId={sessionId} />
+      <ChatInput onMessageSubmit={handleNewMessage} onClearMessages={handleClearMessages} sessionId={sessionId} />
     </div>
   );
 };

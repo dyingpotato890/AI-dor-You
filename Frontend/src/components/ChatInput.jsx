@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const ChatInput = ({ onMessageSubmit, sessionId }) => {
+const ChatInput = ({ onMessageSubmit, onClearMessages, sessionId }) => {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +33,7 @@ const ChatInput = ({ onMessageSubmit, sessionId }) => {
 
   return (
     <div className="input-container">
+      <button id="endChatBtn" onClick={onClearMessages}>End</button>
       <input
         type="text"
         id="textInput"
