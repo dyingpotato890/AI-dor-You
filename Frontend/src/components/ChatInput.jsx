@@ -6,8 +6,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
 
   const handleSubmit = async () => {
     if (text.trim()) {
-      const userMessage = text;
-      onMessageSubmit({ sender: "User", text: userMessage });
+      onMessageSubmit({ sender: "User", text });
       setText("");
       setLoading(true);
 
@@ -15,14 +14,31 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
         const response = await fetch("https://ai-dor-you-2.onrender.com/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: sessionId, message: userMessage }),
+          body: JSON.stringify({ session_id: sessionId, message: text }),
         });
 
-        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(`Server responded with ${response.status}`);
+        }
+
+        const textResponse = await response.text(); // Read as text first
+        let data;
+
+        try {
+          data = JSON.parse(textResponse); // Attempt JSON parsing
+        } catch (error) {
+          console.error("Invalid JSON received:", textResponse);
+          throw new Error("Invalid JSON format from API");
+        }
+
+        if (!data || typeof data.response !== "string") {
+          throw new Error("Unexpected response format");
+        }
+
         onMessageSubmit({ sender: "AI", text: data.response });
       } catch (error) {
         console.error("Error sending message:", error);
-        onMessageSubmit({ sender: "AI", text: "Failed to get a response." });
+        onMessageSubmit({ sender: "AI", text: "Failed to get a valid response from the server." });
       } finally {
         setLoading(false);
       }
@@ -30,7 +46,8 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
   };
 
   const handleEndChat = async () => {
-    onClearMessages(); // Clear messages first
+    setLoading(true);
+    onClearMessages(); // Clear chat history before fetching stats
 
     try {
       const response = await fetch("https://ai-dor-you-2.onrender.com/stats", {
@@ -39,21 +56,42 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
         body: JSON.stringify({ session_id: sessionId }),
       });
 
-      const data = await response.json();
-      onShowStats(data.stats); // Show stats popup
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+
+      const textResponse = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(textResponse);
+      } catch (error) {
+        console.error("Invalid JSON received:", textResponse);
+        throw new Error("Invalid JSON format from API");
+      }
+
+      if (typeof data.stats === "object") {
+        onShowStats(JSON.stringify(data.stats, null, 2));
+      } else {
+        onShowStats('{"error": "Failed to generate statistics."}');
+      }
     } catch (error) {
       console.error("Error fetching stats:", error);
-      onShowStats("Failed to generate statistics.");
+      onShowStats('{"error": "Failed to generate statistics."}');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="input-container">
-      <button id="endChatBtn" onClick={handleEndChat}>End</button>
+      <button id="endChatBtn" onClick={handleEndChat} disabled={loading}>
+        {loading ? "Ending..." : "End"}
+      </button>
       <input
         type="text"
         id="textInput"
-        placeholder="Type your text here..."
+        placeholder="Type your message..."
         value={text}
         onChange={(e) => setText(e.target.value)}
         disabled={loading}

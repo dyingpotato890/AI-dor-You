@@ -1,8 +1,12 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS 
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import google.generativeai as genai
+<<<<<<< Updated upstream
+=======
+import json
+>>>>>>> Stashed changes
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -10,8 +14,11 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # Load API Key
 load_dotenv()
 gemini_api_key = os.getenv("GEMINI_API_KEY")
+<<<<<<< Updated upstream
 
 # Initialize Gemini API Client
+=======
+>>>>>>> Stashed changes
 genai.configure(api_key=gemini_api_key)
 
 # Store conversation history per session
@@ -47,7 +54,11 @@ def chat():
     
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
+<<<<<<< Updated upstream
         response = model.generate_content(prompt)
+=======
+        response = model.generate_content([prompt])
+>>>>>>> Stashed changes
         bot_response = response.text.strip() if hasattr(response, "text") else "No valid response received."
     except Exception as e:
         bot_response = f"An error occurred: {str(e)}"
@@ -68,6 +79,7 @@ def generate_stats():
     user_text = "\n".join(session["user_messages"])
     
     stats_prompt = f"""
+<<<<<<< Updated upstream
     Analyze the following conversation *ONLY based on the user's messages*.
     Provide insights in JSON format:
 
@@ -81,10 +93,29 @@ def generate_stats():
 
     Here are the user's messages:
     {user_text}
+=======
+    Analyze the following conversation **ONLY based on the user's messages**.
+    Provide insights in the following format:
+
+    Flirt Score: X%
+    Chat Analysis: Brief summary
+    Stronger Areas: Bullet points of strengths
+    Flaws & Areas for Improvement: Bullet points of weaknesses
+    Tips for Next Date: Numbered practical tips
+
+    Here are the user's messages:
+    {user_text}
+
+    Respond with the analysis in the exact format shown above.
+>>>>>>> Stashed changes
     """
+
+
+
     
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
+<<<<<<< Updated upstream
         response = model.generate_content(stats_prompt)
 
         if hasattr(response, "text"):
@@ -95,6 +126,54 @@ def generate_stats():
     except Exception as e:
         stats_data = f'{{"error": "An error occurred: {str(e)}"}}'
     
+=======
+        response = model.generate_content([stats_prompt])
+        
+        if hasattr(response, "text"):
+            raw_response = response.text.strip()
+
+            try:
+                # Parse the raw response into structured data
+                stats_data = {}
+                lines = raw_response.split('\n')
+                
+                for line in lines:
+                    if ':' in line:
+                        key, value = line.split(':', 1)
+                        stats_data[key.strip()] = value.strip()
+                
+                # Convert to the required JSON structure
+                formatted_stats = {
+                    "Flirt Score": stats_data.get("Flirt Score", "N/A"),
+                    "Chat Analysis": stats_data.get("Chat Analysis", "N/A"),
+                    "Stronger Areas": stats_data.get("Stronger Areas", "N/A"),
+                    "Flaws & Areas for Improvement": stats_data.get("Flaws & Areas for Improvement", "N/A"),
+                    "Tips for Next Date": stats_data.get("Tips for Next Date", "N/A")
+                }
+                
+                stats_data = formatted_stats
+                    
+            except Exception as e:
+                print(f"Error processing stats: {str(e)}")
+                stats_data = {
+                    "error": "Failed to process statistics",
+                    "details": str(e),
+                    "raw_output": raw_response
+                }
+
+
+        else:
+            stats_data = {"error": "No valid analysis received."}
+    
+    except Exception as e:
+        print(f"Error generating stats: {str(e)}")
+        stats_data = {
+            "error": "Failed to generate statistics",
+            "details": str(e)
+        }
+
+    
+>>>>>>> Stashed changes
     return jsonify({"stats": stats_data})
 
 if __name__ == "__main__":
