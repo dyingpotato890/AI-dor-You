@@ -11,7 +11,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
       setLoading(true);
 
       try {
-        const response = await fetch("http://localhost:5000/chat", {
+        const response = await fetch("https://ai-dor-you-2.onrender.com/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId, message: text }),
@@ -50,7 +50,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
     onClearMessages(); // Clear chat history before fetching stats
 
     try {
-      const response = await fetch("http://localhost:5000/stats", {
+      const response = await fetch("https://ai-dor-you-2.onrender.com/stats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId }),

@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import google.generativeai as genai
 import logging
+import re
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -80,18 +81,26 @@ def generate_stats():
     
     stats_prompt = f"""
     Analyze the following conversation **ONLY based on the user's messages**.
-    Provide insights in the following format:
+    Provide insights **strictly** in the following format:
 
-    Flirt Score: X%
-    Chat Analysis: Brief summary
-    Stronger Areas: Bullet points of strengths
-    Flaws & Areas for Improvement: Bullet points of weaknesses
-    Tips for Next Date: Numbered practical tips
+    **Flirt Score:** X%
+    **Chat Analysis:** (Brief summary)
+    **Stronger Areas:**  
+    - Bullet points  
+    - Bullet points  
+
+    **Flaws & Areas for Improvement:**  
+    - Bullet points  
+    - Bullet points  
+
+    **Tips for Next Date:**  
+    1. Numbered tip  
+    2. Numbered tip  
 
     Here are the user's messages:
     {user_text}
 
-    Respond with the analysis in the exact format shown above.
+    Ensure the response follows this format exactly.
     """
     
     try:
@@ -103,22 +112,27 @@ def generate_stats():
         else:
             raise ValueError("Invalid or empty response from Gemini API")
 
-        # Process response into structured data
+        # Extract structured data using regex
         stats_data = {}
-        lines = raw_response.split("\n")
-        
-        for line in lines:
-            if ":" in line:
-                key, value = line.split(":", 1)
-                stats_data[key.strip()] = value.strip()
+        patterns = {
+            "Flirt Score": r"\*\*Flirt Score:\*\s*(\d+%)",
+            "Chat Analysis": r"\*\*Chat Analysis:\*\s*(.*?)\n",
+            "Stronger Areas": r"\*\*Stronger Areas:\*\s*((?:- .+\n?)+)",
+            "Flaws & Areas for Improvement": r"\*\*Flaws & Areas for Improvement:\*\s*((?:- .+\n?)+)",
+            "Tips for Next Date": r"\*\*Tips for Next Date:\*\s*((?:\d+\. .+\n?)+)"
+        }
+
+        for key, pattern in patterns.items():
+            match = re.search(pattern, raw_response, re.DOTALL)
+            stats_data[key] = match.group(1).strip() if match else "N/A"
 
         # Convert to structured JSON
         formatted_stats = {
-            "Flirt Score": stats_data.get("Flirt Score", "N/A"),
-            "Chat Analysis": stats_data.get("Chat Analysis", "N/A"),
-            "Stronger Areas": stats_data.get("Stronger Areas", "N/A"),
-            "Flaws & Areas for Improvement": stats_data.get("Flaws & Areas for Improvement", "N/A"),
-            "Tips for Next Date": stats_data.get("Tips for Next Date", "N/A")
+            "Flirt Score": stats_data["Flirt Score"],
+            "Chat Analysis": stats_data["Chat Analysis"],
+            "Stronger Areas": stats_data["Stronger Areas"].split("\n") if stats_data["Stronger Areas"] != "N/A" else [],
+            "Flaws & Areas for Improvement": stats_data["Flaws & Areas for Improvement"].split("\n") if stats_data["Flaws & Areas for Improvement"] != "N/A" else [],
+            "Tips for Next Date": stats_data["Tips for Next Date"].split("\n") if stats_data["Tips for Next Date"] != "N/A" else []
         }
 
     except Exception as e:
