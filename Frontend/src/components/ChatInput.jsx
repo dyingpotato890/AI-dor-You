@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const ChatInput = ({ onMessageSubmit, onClearMessages, sessionId }) => {
+const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId }) => {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -14,9 +14,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, sessionId }) => {
       try {
         const response = await fetch("http://127.0.0.1:5000/chat", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId, message: userMessage }),
         });
 
@@ -31,9 +29,27 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, sessionId }) => {
     }
   };
 
+  const handleEndChat = async () => {
+    onClearMessages(); // Clear messages first
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/stats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+
+      const data = await response.json();
+      onShowStats(data.stats); // Show stats popup
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      onShowStats("Failed to generate statistics.");
+    }
+  };
+
   return (
     <div className="input-container">
-      <button id="endChatBtn" onClick={onClearMessages}>End</button>
+      <button id="endChatBtn" onClick={handleEndChat}>End</button>
       <input
         type="text"
         id="textInput"

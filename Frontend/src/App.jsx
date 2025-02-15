@@ -1,27 +1,43 @@
 import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid"; // Ensure uuid is installed
+import { v4 as uuidv4 } from "uuid";
 import HeartBackground from "./components/HeartBackground";
 import ChatInput from "./components/ChatInput";
 import ChatDisplay from "./components/ChatDisplay";
+import StatsPopup from "./components/StatsPopup";
 import "./components/background/background.css";
 
 const App = () => {
   const [messages, setMessages] = useState([]);
-  const sessionId = useState(uuidv4())[0]; // Persistent session ID
+  const [stats, setStats] = useState(null);
+  const sessionId = useState(uuidv4())[0];
 
   const handleNewMessage = (msg) => {
-    setMessages((prevMessages) => [...prevMessages, msg]);
+    setMessages((prevMessages) => [...prevMessages, msg]); // Append messages
   };
 
   const handleClearMessages = () => {
-    setMessages([]); // ✅ Clear chat messages when "End" button is clicked
+    setMessages([]);
+  };
+
+  const handleShowStats = (statsData) => {
+    setStats(statsData); // Show stats popup
+  };
+
+  const handleCloseStats = () => {
+    setStats(null); // Hide stats popup
   };
 
   return (
     <div className="container">
       <HeartBackground />
       <ChatDisplay messages={messages} />
-      <ChatInput onMessageSubmit={handleNewMessage} onClearMessages={handleClearMessages} sessionId={sessionId} />
+      <ChatInput
+        onMessageSubmit={handleNewMessage}
+        onClearMessages={handleClearMessages}
+        onShowStats={handleShowStats}
+        sessionId={sessionId}
+      />
+      {stats && <StatsPopup stats={stats} onClose={handleCloseStats} />}
     </div>
   );
 };
