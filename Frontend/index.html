@@ -1,79 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Heart Background using Anime.js</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <div class="input-container">
-            <button id="endChatBtn">End</button>
-            <input type="text" id="textInput" placeholder="Type your text or question here...">
-            <button id="submitBtn">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="11" stroke="pink" stroke-width="2" fill="white"/>
-                    <path d="M12 7L12 17M12 7L8 11M12 7L16 11" stroke="pink" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-        </div>
-        <div id="displayContainer"></div>
-        <h1></h1>
-        <div class="heart"></div>
-    </div>
-
-    <script src="anime.js"></script>
-    <script>
-        const container = document.querySelector(".container");
-        for (let i = 0; i <= 100; i++) {
-            const heart = document.createElement("div");
-            heart.classList.add("heart");
-            container.appendChild(heart);
-        }
-
-        function animateHearts() {
-            anime({
-                targets: ".heart",
-                translateX: () => anime.random(-700, 700),
-                translateY: () => anime.random(-500, 500),
-                rotate: 45,
-                scale: () => anime.random(1, 3),
-                easing: "easeInOutBack",
-                duration: 3000,
-                delay: anime.stagger(10),
-                complete: animateHearts
-            });
-        }
-
-        animateHearts();
-
-        const input = document.getElementById('textInput');
-        const submitBtn = document.getElementById('submitBtn');
-        const endChatBtn = document.getElementById('endChatBtn');
-        const display = document.getElementById('displayContainer');
-
-        submitBtn.addEventListener('click', () => {
-            const text = input.value.trim();
-            if (text) {
-                const p = document.createElement('p');
-                p.textContent = text;
-                display.appendChild(p);
-                input.value = '';
-
-                anime({
-                    targets: p,
-                    opacity: [0, 1],
-                    translateY: [20, 0],
-                    duration: 500,
-                    easing: 'easeOutQuad'
-                });
-            }
-        });
-
-        endChatBtn.addEventListener('click', () => {
-            display.innerHTML = ''; // Clears the chat display
-        });
-    </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
