@@ -1,30 +1,48 @@
 import React, { useState } from "react";
 
-const ChatInput = ({ onMessageSubmit, onClearMessages }) => {
+const ChatInput = ({ onMessageSubmit, sessionId }) => {
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (text.trim()) {
-      onMessageSubmit(text);
+      const userMessage = text;
+      onMessageSubmit({ sender: "User", text: userMessage });
       setText("");
+      setLoading(true);
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ session_id: sessionId, message: userMessage }),
+        });
+
+        const data = await response.json();
+        onMessageSubmit({ sender: "AI", text: data.response });
+      } catch (error) {
+        console.error("Error sending message:", error);
+        onMessageSubmit({ sender: "AI", text: "Failed to get a response." });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   return (
     <div className="input-container">
-      <button id="endChatBtn" onClick={onClearMessages}>End</button>
       <input
         type="text"
         id="textInput"
         placeholder="Type your text here..."
         value={text}
         onChange={(e) => setText(e.target.value)}
+        disabled={loading}
       />
-      <button id="submitBtn" onClick={handleSubmit}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="11" stroke="pink" strokeWidth="2" fill="white" />
-          <path d="M12 7L12 17M12 7L8 11M12 7L16 11" stroke="pink" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+      <button id="submitBtn" onClick={handleSubmit} disabled={loading}>
+        {loading ? "..." : "Send"}
       </button>
     </div>
   );
