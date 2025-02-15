@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS 
 from dotenv import load_dotenv
 import os
-from google import genai
+import google.generativeai as genai
 
 app = Flask(__name__)
 CORS(app)
@@ -12,7 +12,7 @@ load_dotenv()
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
 # Initialize Gemini API Client
-client = genai.Client(api_key=gemini_api_key)
+genai.configure(api_key=gemini_api_key)
 
 # Store conversation history per session
 user_sessions = {}
@@ -33,12 +33,11 @@ def chat():
     session["conv_history"].append(f"User: {user_input}")
     session["user_messages"].append(user_input)
     
-    context = "\n".join(session["conv_history"][-5:])
+    context = "\n".join(session["conv_history"][-5:])  # Use last 5 exchanges for context
     
     prompt = f"""
-    Let's have a fun and engaging conversation! Be playful, witty, and genuinely interested
-    in getting to know me. Ask thoughtful questions about my passions and dreams.
-    Make the conversation feel effortless, warm, and engaging and more importantly, human-like.
+    Let's have a fun and engaging conversation! Be playful, witty, and genuinely interested.
+    Ask thoughtful questions and make the chat feel warm and effortless.
 
     Here's our conversation so far:
     {context}
@@ -47,11 +46,9 @@ def chat():
     """
     
     try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash", contents=prompt
-        )
-        
-        bot_response = response.text.strip() if hasattr(response, "text") else "No valid response received. Try again later."
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt)
+        bot_response = response.text.strip() if hasattr(response, "text") else "No valid response received."
     except Exception as e:
         bot_response = f"An error occurred: {str(e)}"
     
@@ -71,37 +68,34 @@ def generate_stats():
     user_text = "\n".join(session["user_messages"])
     
     stats_prompt = f"""
-    Analyze the following conversation **ONLY based on the user's messages**.
-    Provide the following insights:
-    
-    1. **Flirt Score:** A percentage (0-100%) based on how flirty, playful, or romantic the user's messages were.
-    2. **Chat Analysis:** A short summary of the user's conversation style.
-    3. **Stronger Areas:** What the user did well (e.g., humor, deep talk, engagement).
-    4. **Flaws & Areas for Improvement:** How the user can improve their conversational skills.
-    5. **Tips for Next Date:** Fun and useful tips to improve the next conversation.
+    Analyze the following conversation *ONLY based on the user's messages*.
+    Provide insights in JSON format:
+
+    {{
+        "Flirt Score": "X%",
+        "Chat Analysis": "Brief summary",
+        "Stronger Areas": "What was good",
+        "Flaws & Areas for Improvement": "Suggestions",
+        "Tips for Next Date": "Practical tips"
+    }}
 
     Here are the user's messages:
     {user_text}
-
-    Provide your response in a structured format like this:
-
-    **Flirt Score:** X%
-    **Chat Analysis:** [Brief Summary]
-    **Stronger Areas:** [What was good]
-    **Flaws & Areas for Improvement:** [Suggestions]
-    **Tips for Next Date:** [Practical tips]
     """
     
     try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash", contents=stats_prompt
-        )
-        
-        stats = response.text.strip() if hasattr(response, "text") else "No valid analysis received."
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(stats_prompt)
+
+        if hasattr(response, "text"):
+            stats_data = response.text.strip()
+        else:
+            stats_data = '{"error": "No valid analysis received."}'
+
     except Exception as e:
-        stats = f"An error occurred: {str(e)}"
+        stats_data = f'{{"error": "An error occurred: {str(e)}"}}'
     
-    return jsonify({"stats": stats})
+    return jsonify({"stats": stats_data})
 
 if __name__ == "__main__":
     app.run(debug=True)
