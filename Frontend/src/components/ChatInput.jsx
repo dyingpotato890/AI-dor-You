@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ArrowUp } from "lucide-react"; // Importing the arrow icon
 
 const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId }) => {
   const [text, setText] = useState("");
@@ -11,7 +12,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
       setLoading(true);
 
       try {
-        const response = await fetch("https://ai-dor-you-2.onrender.com/chat", { /*https://ai-dor-you-2.onrender.com */
+        const response = await fetch("https://ai-dor-you-2.onrender.com/chat", { 
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId, message: text }),
@@ -21,11 +22,11 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
           throw new Error(`Server responded with ${response.status}`);
         }
 
-        const textResponse = await response.text(); // Read as text first
+        const textResponse = await response.text();
         let data;
 
         try {
-          data = JSON.parse(textResponse); // Attempt JSON parsing
+          data = JSON.parse(textResponse);
         } catch (error) {
           console.error("Invalid JSON received:", textResponse);
           throw new Error("Invalid JSON format from API");
@@ -96,8 +97,26 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
         onChange={(e) => setText(e.target.value)}
         disabled={loading}
       />
-      <button id="submitBtn" onClick={handleSubmit} disabled={loading}>
-        {loading ? "..." : "Send"}
+      <button
+        id="submitBtn"
+        onClick={handleSubmit}
+        disabled={loading}
+        style={{
+          backgroundColor: "##ff007f",
+          border: "none",
+          width: "40px",
+          height: "40px",
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: loading ? "not-allowed" : "pointer",
+          opacity: loading ? 0.6 : 1,
+          transition: "background 0.3s ease",
+          boxShadow: "0 2px 4px rgba(255, 0, 234, 0.2)",
+        }}
+      >
+        <ArrowUp size={20} color="#ff007f" /> {/* Pink color */}
       </button>
     </div>
   );

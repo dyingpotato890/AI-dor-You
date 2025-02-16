@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\DATASET2\Valentine\AI-dor-You\backend\venv
+set VIRTUAL_ENV=C:\DATASET2\New folder (2)\AI-dor-You\Backend\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
