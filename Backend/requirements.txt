@@ -3,3 +3,4 @@ flask-cors
 python-dotenv
 google-generativeai
 gunicorn
+spacy
