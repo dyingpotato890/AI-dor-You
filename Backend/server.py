@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 import google.generativeai as genai
 import logging
-import re
+import spacy
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -13,6 +13,9 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 load_dotenv()
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=gemini_api_key)
+
+# Load NLP For Stats
+nlp = spacy.load("en_core_web_sm")
 
 # Store conversation history per session
 user_sessions = {}
@@ -103,43 +106,49 @@ def generate_stats():
     Ensure the response follows this format exactly.
     """
     
+    formatted_stats = {"Flirt Score": "N/A", "Chat Analysis": "No data available", "Stronger Areas": [], "Flaws & Areas for Improvement": [], "Tips for Next Date": []}
+
     try:
         model = genai.GenerativeModel("gemini-2.0-flash")
         response = model.generate_content([stats_prompt])
+        
+        if not hasattr(response, "text"):
+            raise ValueError("Unexpected API response format")
 
-        if hasattr(response, 'text') and response.text.strip():
-            raw_response = response.text.strip()
-        else:
-            raise ValueError("Invalid or empty response from Gemini API")
+        text = response.text
+        doc = nlp(text)
 
-        # Extract structured data using regex
-        stats_data = {}
-        patterns = {
-            "Flirt Score": r"\*\*Flirt Score:\*\s*(\d+%)",
-            "Chat Analysis": r"\*\*Chat Analysis:\*\s*(.*?)\n",
-            "Stronger Areas": r"\*\*Stronger Areas:\*\s*((?:- .+\n?)+)",
-            "Flaws & Areas for Improvement": r"\*\*Flaws & Areas for Improvement:\*\s*((?:- .+\n?)+)",
-            "Tips for Next Date": r"\*\*Tips for Next Date:\*\s*((?:\d+\. .+\n?)+)"
-        }
+        extracted_data = {}
+        sections = ["Flirt Score", "Chat Analysis", "Stronger Areas", "Flaws & Areas for Improvement", "Tips for Next Date"]
 
-        for key, pattern in patterns.items():
-            match = re.search(pattern, raw_response, re.DOTALL)
-            stats_data[key] = match.group(1).strip() if match else "N/A"
+        lines = text.split("\n")
+        current_section = None
 
-        # Convert to structured JSON
-        formatted_stats = {
-            "Flirt Score": stats_data["Flirt Score"],
-            "Chat Analysis": stats_data["Chat Analysis"],
-            "Stronger Areas": stats_data["Stronger Areas"].split("\n") if stats_data["Stronger Areas"] != "N/A" else [],
-            "Flaws & Areas for Improvement": stats_data["Flaws & Areas for Improvement"].split("\n") if stats_data["Flaws & Areas for Improvement"] != "N/A" else [],
-            "Tips for Next Date": stats_data["Tips for Next Date"].split("\n") if stats_data["Tips for Next Date"] != "N/A" else []
-        }
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            for section in sections:
+                if line.startswith(f"**{section}:**"):
+                    current_section = section
+                    extracted_data[current_section] = []
+                    inline_content = line[len(f"**{section}:**"):].strip()
+                    if inline_content:
+                        extracted_data[current_section].append(inline_content)
+                    break
+            else:
+                if current_section:
+                    extracted_data[current_section].append(line)
+
+        for key in extracted_data:
+            extracted_data[key] = "\n".join(extracted_data[key]).strip()
 
     except Exception as e:
         logger.error(f"Stats API Error: {str(e)}")
-        formatted_stats = {"error": "Failed to generate statistics", "details": str(e), "raw_output": raw_response if 'raw_response' in locals() else "N/A"}
+        extracted_data = {"error": str(e)}
 
-    return jsonify({"stats": formatted_stats, "status": "success"})
+    return jsonify({"stats": extracted_data if extracted_data else formatted_stats, "status": "success" if "error" not in extracted_data else "error"})
 
 if __name__ == "__main__":
     app.run(debug=True)

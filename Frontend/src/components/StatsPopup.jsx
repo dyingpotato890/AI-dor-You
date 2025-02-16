@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import "./StatsPopup.css"
 
 const StatsPopup = ({ stats, onClose }) => {
   if (!stats) return null; // Don't show if no stats available
@@ -13,8 +14,8 @@ const StatsPopup = ({ stats, onClose }) => {
   }, [stats]);
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.popup}>
+    <div className="stats-overlay">
+      <div className="stats-container">  
         <h2 style={styles.heading}>Chat Statistics</h2>
         {parsedStats.error ? (
           <p style={styles.text}>{parsedStats.error}</p>
