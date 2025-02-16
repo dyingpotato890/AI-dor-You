@@ -15,7 +15,15 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=gemini_api_key)
 
 # Load NLP For Stats
-nlp = spacy.load("en_core_web_sm")
+import spacy
+import subprocess
+
+# Ensure the model is installed
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+    nlp = spacy.load("en_core_web_sm")
 
 # Store conversation history per session
 user_sessions = {}
