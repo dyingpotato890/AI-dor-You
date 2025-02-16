@@ -11,7 +11,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
       setLoading(true);
 
       try {
-        const response = await fetch("https://ai-dor-you-2.onrender.com/chat", {
+        const response = await fetch("http://localhost:5000/chat", { /*https://ai-dor-you-2.onrender.com */
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId, message: text }),
@@ -48,28 +48,28 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
   const handleEndChat = async () => {
     setLoading(true);
     onClearMessages(); // Clear chat history before fetching stats
-
+  
     try {
-      const response = await fetch("https://ai-dor-you-2.onrender.com/stats", {
+      const response = await fetch("http://localhost:5000/stats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId }),
       });
-
+  
       if (!response.ok) {
         throw new Error(`Server responded with ${response.status}`);
       }
-
+  
       const textResponse = await response.text();
       let data;
-
+  
       try {
         data = JSON.parse(textResponse);
       } catch (error) {
         console.error("Invalid JSON received:", textResponse);
         throw new Error("Invalid JSON format from API");
       }
-
+  
       if (typeof data.stats === "object") {
         onShowStats(JSON.stringify(data.stats, null, 2));
       } else {
@@ -81,7 +81,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="input-container">
