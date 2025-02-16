@@ -113,7 +113,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
           cursor: loading ? "not-allowed" : "pointer",
           opacity: loading ? 0.6 : 1,
           transition: "background 0.3s ease",
-          boxShadow: "0 2px 4px rgba(255, 0, 234, 0.2)",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
         }}
       >
         <ArrowUp size={20} color="#ff007f" /> {/* Pink color */}
