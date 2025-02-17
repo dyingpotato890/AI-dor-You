@@ -27,7 +27,8 @@
   z-index: 500;
 }
 
-.heart::before, .heart::after {
+.heart::before,
+.heart::after {
   content: "";
   position: absolute;
   width: 100%;
@@ -131,11 +132,11 @@
 
 #displayContainer {
   position: absolute;
-  bottom: 120px;
+  bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  width: 1500px;
-  height: 620px;
+  width: 1330px;
+  height: 570px;
   max-height: 900px;
   overflow-y: auto;
   background: rgba(255, 255, 255, 0.3);
@@ -165,7 +166,7 @@
 
 /* User messages - Left-aligned in a pink box */
 .user-message {
-  background: rgba(238, 144, 211, 0.5); /* Light transparent pink */
+  background: rgba(238, 144, 211, 0.5);
   border: 1px solid rgba(238, 144, 211, 0.5);
   color: rgb(13, 13, 129);
   text-align: right;
@@ -178,10 +179,10 @@
 
 /* Bot messages - Right-aligned in a light green box */
 .bot-message {
-  background: rgba(238, 144, 211, 0.5); /* Light transparent green */
-  border: 1px solid rgba(238, 144, 211, 0.5) ;
-  color: rgb(92, 5, 69); 
-  text-align:  left;
+  background: rgba(238, 144, 211, 0.5);
+  border: 1px solid rgba(238, 144, 211, 0.5);
+  color: rgb(92, 5, 69);
+  text-align: left;
   border-radius: 12px;
   max-width: 60%;
   word-wrap: break-word;
@@ -204,4 +205,105 @@
   word-wrap: break-word;
   font-size: 18px;
   font-weight: 490;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 1024px) {
+  #textInput {
+    width: 90%;
+    font-size: 16px;
+  }
+
+  #displayContainer {
+    width: 90%;
+    height: 750px;
+    bottom: 100px;
+  }
+
+  .user-message,
+  .bot-message {
+    max-width: 80%;
+    font-size: 16px;
+  }
+
+  .message-content {
+    font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .input-container {
+    width: 100%;
+    padding: 6px;
+    gap: 6px;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #textInput {
+    width: 80%;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  #endChatBtn {
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  #displayContainer {
+    width: 95%;
+    height: 675px;
+    bottom: 100px;
+    padding: 10px;
+  }
+
+  .user-message,
+  .bot-message {
+    max-width: 90%;
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .message-content {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .input-container {
+    width: 100%;
+    padding: 6px;
+    gap: 6px;
+  }
+  #textInput {
+    width: 100%;
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  #endChatBtn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  #displayContainer {
+    width: 95%;
+    height: 685px;
+    bottom: 100px;
+    padding: 8px;
+  }
+
+  .user-message,
+  .bot-message {
+    max-width: 95%;
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .message-content {
+    font-size: 12px;
+  }
 }
