@@ -372,7 +372,7 @@
 @media screen and (max-width: 2160px) {
   .input-container {
     width: 65%;
-    padding: 2px;
+    padding:10px;
     gap: 12px;
   }
   #textInput {
@@ -382,7 +382,7 @@
 
   #displayContainer {
     width: 80%;
-    height: 650px;
+    height: 570px;
   }
 
   .user-message,
