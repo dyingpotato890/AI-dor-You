@@ -136,7 +136,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 1330px;
-  height: 580px;
+  height: 670px;
   max-height: 900px;
   overflow-y: auto;
   background: rgba(255, 255, 255, 0.3);
@@ -216,7 +216,7 @@
 
   #displayContainer {
     width: 90%;
-    height: 750px;
+    height: 1050px;
     bottom: 100px;
   }
 
@@ -231,7 +231,7 @@
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 720px) {
   .input-container {
     width: 100%;
     padding: 6px;
@@ -255,7 +255,7 @@
 
   #displayContainer {
     width: 95%;
-    height: 675px;
+    height: 700px;
     bottom: 100px;
     padding: 10px;
   }
@@ -279,9 +279,8 @@
     gap: 6px;
   }
   #textInput {
-    width: 100%;
+    width: 120%;
     font-size: 12px;
-    padding: 8px;
   }
 
   #endChatBtn {
@@ -308,9 +307,9 @@
   }
 }
 
-@media screen and (min-height: 750px) and (max-height: 1000px) {
+@media screen and (min-height: 700px) and (max-height: 1000px) {
   #displayContainer {
-    height: 500px;
+    height: 850px;
     width: 90%;
   }
 
@@ -327,5 +326,68 @@
 
   #textInput {
     width: 90%;
+  }
+}
+
+
+/* 1080x1920 (FHD) */
+@media screen and (max-width: 1080px) {
+  #textInput {
+    width: 85%;
+    font-size: 18px;
+  }
+
+  #displayContainer {
+    width: 90%;
+    height: 750px;
+  }
+
+  .user-message,
+  .bot-message {
+    max-width: 70%;
+    font-size: 18px;
+  }
+}
+
+/* 1440x2560 (QHD) */
+@media screen and (max-width: 1440px) {
+  #textInput {
+    width: 90%;
+    font-size: 20px;
+  }
+
+  #displayContainer {
+    width: 85%;
+    height: 850px;
+  }
+
+  .user-message,
+  .bot-message {
+    max-width: 65%;
+    font-size: 20px;
+  }
+}
+
+/* 2160x3840 (4K UHD) */
+@media screen and (max-width: 2160px) {
+  .input-container {
+    width: 65%;
+    padding:10px;
+    gap: 12px;
+  }
+  #textInput {
+    width: 95%;
+    font-size: 24px;
+  }
+
+  #displayContainer {
+    width: 80%;
+    height: 570px;
+  }
+
+  .user-message,
+  .bot-message {
+    max-width: 60%;
+    font-size: 24px;
   }
 }
