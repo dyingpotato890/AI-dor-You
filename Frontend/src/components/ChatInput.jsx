@@ -12,7 +12,7 @@ const ChatInput = ({ onMessageSubmit, onClearMessages, onShowStats, sessionId })
       setLoading(true);
 
       try {
-        const response = await fetch("https://ai-dor-you-2.onrender.com/chat", { 
+        const response = await fetch("https://ai-dor-you-2.onrender.com/chat", {  /*https://ai-dor-you-2.onrender.com */
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ session_id: sessionId, message: text }),
